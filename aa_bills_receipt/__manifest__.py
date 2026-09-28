@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Bills Receipt Creation',
-    'version': '17.0.1.1.0',
+    'version': '20.0.1.0.0',
     'summary': 'Create the warehouse receipt of a vendor bill in one click.',
     'description': """
 Bills Receipt Creation
@@ -10,8 +10,9 @@ Bills Receipt Creation
   with the storable / consumable lines of the bill.
 * Receipts smart button on the bill, linked to the receipts through a real relation
   (safe in multi-company databases).
-* Receipt valued at the billed cost and bill lines moved to the stock input account
-  (automated inventory valuation).
+* Receipt valued at the billed cost. Odoo 20 values the receipt on its own, straight from the
+  stock move, through the locations' valuation accounts, so this module does not touch the
+  bill line's account.
 * Protection against duplicate receipts.
     """,
     'author': 'Allam Bushra',

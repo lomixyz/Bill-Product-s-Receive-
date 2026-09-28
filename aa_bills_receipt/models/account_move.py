@@ -62,7 +62,11 @@ class AccountMove(models.Model):
         """Stock move values for a bill line.
 
         The unit price is the bill price (company currency, product UoM) so the receipt is
-        valued at the billed cost and the stock input account is cleared exactly by the bill.
+        valued at the billed cost. Odoo 20 values the receipt on its own, straight from the
+        stock move, through the locations' valuation accounts (Inventory > Configuration >
+        Locations): there is no "stock input account" to redirect the bill line to any more
+        (that mechanism from earlier Odoo versions was removed), so this module does not touch
+        the bill line's account_id at all.
         """
         self.ensure_one()
         product = line.product_id
@@ -70,10 +74,13 @@ class AccountMove(models.Model):
         price_unit = line.balance / line.quantity if line.quantity else 0.0
         price_unit = uom._compute_price(price_unit, product.uom_id)
         return {
-            'name': line.name or product.display_name,
+            # Odoo 20 renamed stock.move's free-text label from `name` to `description_picking`
+            # (computed/inverse; setting it here stores it as the manual description), and its
+            # unit-of-measure field from `product_uom` to `uom_id`.
+            'description_picking': line.name or product.display_name,
             'product_id': product.id,
             'product_uom_qty': line.quantity,
-            'product_uom': uom.id,
+            'uom_id': uom.id,
             'price_unit': max(price_unit, 0.0),
             'location_id': source_location.id,
             'location_dest_id': dest_location.id,
@@ -87,25 +94,14 @@ class AccountMove(models.Model):
         picking_type = self._get_receipt_picking_type()
         source_location, dest_location = self._get_receipt_locations(picking_type)
 
-        move_vals_list = []
-        account_updates = []  # (bill line, stock input account)
-        for line in self.invoice_line_ids.filtered(lambda l: l.display_type == 'product'):
-            product = line.product_id
-            if not product or product.type not in ('consu', 'product') or line.quantity <= 0:
-                continue
-
-            # Accounts / valuation are company dependent: read them in the bill's company.
-            categ = product.categ_id.with_company(self.company_id)
-            if categ.property_valuation == 'real_time':
-                stock_input_account = categ.property_stock_account_input_categ_id
-                if not stock_input_account:
-                    raise UserError(_(
-                        'No stock input account defined for product category: %s', categ.display_name))
-                account_updates.append((line, stock_input_account))
-
-            move_vals_list.append(
-                self._prepare_receipt_move_vals(line, source_location, dest_location))
-
+        move_vals_list = [
+            self._prepare_receipt_move_vals(line, source_location, dest_location)
+            for line in self.invoice_line_ids.filtered(lambda l: l.display_type == 'product')
+            # Odoo 20 dropped the 'product' (storable) value from product.type: a physical good
+            # is always 'consu', with the separate `is_storable` flag telling storable apart from
+            # non-storable. Either way it can be received, so only services/combos are excluded.
+            if line.product_id and line.product_id.type == 'consu' and line.quantity > 0
+        ]
         if not move_vals_list:
             raise UserError(_(
                 'Bill %s has no storable or consumable product line to receive.', self.name))
@@ -120,10 +116,6 @@ class AccountMove(models.Model):
             'vendor_bill_id': self.id,
             'move_ids': [Command.create(vals) for vals in move_vals_list],
         })
-
-        for line, account in account_updates:
-            if line.account_id != account:
-                line.account_id = account
 
         picking.action_confirm()
         picking.action_assign()

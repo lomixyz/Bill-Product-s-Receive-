@@ -1,7 +1,7 @@
 <div style="font-family: -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; color: #1f2937; max-width: 1040px; margin: 0 auto;">
 
   <div style="text-align: center; padding: 36px 16px 8px;">
-    <span style="display: inline-block; background-color: #f1e4ee; color: #714b67; font-size: 12px; font-weight: 700; letter-spacing: .04em; padding: 6px 14px; border-radius: 999px; margin-bottom: 18px;">ODOO 17.0 &middot; COMMUNITY &amp; ENTERPRISE</span>
+    <span style="display: inline-block; background-color: #f1e4ee; color: #714b67; font-size: 12px; font-weight: 700; letter-spacing: .04em; padding: 6px 14px; border-radius: 999px; margin-bottom: 18px;">ODOO 20.0 &middot; COMMUNITY &amp; ENTERPRISE</span>
     <h1 style="font-size: 34px; font-weight: 800; margin: 0; line-height: 1.25; color: #111827;">Bills Receipt <span style="color: #714b67;">Creation</span></h1>
     <p style="color: #4b5563; font-size: 16px; margin: 14px auto 0; max-width: 620px;">Create the warehouse receipt of a vendor bill in one click &mdash; so your stock never falls behind your accounting.</p>
   </div>
@@ -56,7 +56,7 @@
       <tr>
         <td style="width: 50%; vertical-align: top; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 14px; padding: 20px 22px;">
           <div style="font-size: 15px; font-weight: 700; color: #111827; margin-bottom: 8px;"><span style="color: #714b67;">&#128176;</span> Valued at the billed cost</div>
-          <div style="font-size: 13.5px; color: #4b5563; line-height: 1.55;">The receipt is priced from the bill's own line prices, and the stock input account is cleared exactly by the bill.</div>
+          <div style="font-size: 13.5px; color: #4b5563; line-height: 1.55;">The receipt is priced straight from the bill's own line prices, using Odoo 20's own per-location valuation accounts.</div>
         </td>
         <td style="width: 50%; vertical-align: top; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 14px; padding: 20px 22px;">
           <div style="font-size: 15px; font-weight: 700; color: #111827; margin-bottom: 8px;"><span style="color: #714b67;">&#9881;&#65039;</span> No setup required</div>
@@ -74,6 +74,16 @@
       <li style="font-size: 14px; margin-bottom: 8px; line-height: 1.6;">Click <b style="color: #111827;">Create Receipt</b> in the bill's header.</li>
       <li style="font-size: 14px; margin-bottom: 8px; line-height: 1.6;">Open the <b style="color: #111827;">Receipts</b> smart button and validate the transfer &mdash; done.</li>
     </ol>
+  </div>
+
+  <div style="background-color: #fdf6ec; border: 1px solid #f2ddb3; border-radius: 14px; padding: 26px 28px; margin: 18px 16px 8px;">
+    <h2 style="font-size: 17px; font-weight: 800; color: #92651a; margin: 0 0 10px;">&#8505;&#65039; Odoo 20 valuation note</h2>
+    <p style="font-size: 13.5px; color: #4b5563; line-height: 1.6; margin: 0;">
+      Odoo 20 values a receipt directly from the stock move, through the valuation accounts set on the source and
+      destination <b style="color: #111827;">locations</b> (Inventory &gt; Configuration &gt; Locations) &mdash; the
+      old per-category "Stock Input Account" from earlier Odoo versions no longer exists. This module never touches
+      the bill line's account; make sure the relevant locations have a valuation account configured.
+    </p>
   </div>
 
   <div style="text-align: center; padding: 34px 16px 20px; color: #6b7280; font-size: 13px; border-top: 1px solid #e5e7eb; margin-top: 30px;">
